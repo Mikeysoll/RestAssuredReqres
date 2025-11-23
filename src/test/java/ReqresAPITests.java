@@ -43,7 +43,7 @@ public class ReqresAPITests extends TestBase {
     }
 
     @Test
-    public void getUserById() {
+    public void updateUser() {
 
         given()
                 .log().uri()
