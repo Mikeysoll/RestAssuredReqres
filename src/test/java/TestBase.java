@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 public class TestBase {
 
     @BeforeAll
-    static void setup() {
-        RestAssured.baseURI = "https://automationexercise.com/api";
+    public static void setup() {
+        RestAssured.baseURI = "https://reqres.in/api";
     }
 }
