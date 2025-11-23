@@ -52,7 +52,7 @@ public class ReqresAPITests extends TestBase {
                 .body("{ \"name\": \"mikey\", \"job\": \"devOps\" }")
 
                 .when()
-                .patch("/users/2")
+                .put("/users/2")
 
                 .then()
                 .log().body()
@@ -70,7 +70,7 @@ public class ReqresAPITests extends TestBase {
                 .contentType("application/json")
 
                 .when()
-                .get("/users/999")
+                .get("/users/9999")
 
                 .then()
                 .log().body()
