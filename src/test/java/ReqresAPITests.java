@@ -8,7 +8,7 @@ import static io.restassured.RestAssured.given;
 public class ReqresAPITests extends TestBase {
 
     @Test
-    public void listUsers() {
+    public void listUsersTest() {
         given()
                 .log().uri()
                 .header("x-api-key", "reqres-free-v1")
@@ -24,7 +24,7 @@ public class ReqresAPITests extends TestBase {
     }
 
     @Test
-    public void createUser() {
+    public void createUserTest() {
         given()
                 .log().uri()
                 .header("x-api-key", "reqres-free-v1")
@@ -43,7 +43,7 @@ public class ReqresAPITests extends TestBase {
     }
 
     @Test
-    public void updateUser() {
+    public void updateUserTest() {
 
         given()
                 .log().uri()
@@ -63,7 +63,7 @@ public class ReqresAPITests extends TestBase {
     }
 
     @Test
-    public void userNotFound() {
+    public void userNotFoundTest() {
         given()
                 .log().uri()
                 .header("x-api-key", "reqres-free-v1")
@@ -78,7 +78,7 @@ public class ReqresAPITests extends TestBase {
     }
 
     @Test
-    public void registrationSuccessful() {
+    public void registrationSuccessfulTest() {
         given()
                 .log().uri()
                 .header("x-api-key", "reqres-free-v1")
@@ -93,5 +93,38 @@ public class ReqresAPITests extends TestBase {
                 .statusCode(200)
                 .body("id", not(empty()))
                 .body("token", equalTo("QpwL5tke4Pnpja7X4"));
+    }
+
+    @Test
+    public void partialUpdateUserTest(){
+        given()
+                .log().uri()
+                .header("x-api-key", "reqres-free-v1")
+                .contentType("application/json")
+                .body("{ \"name\": \"morpheus\", \"job\": \"zion resident\" }")
+
+                .when()
+                .patch("/users/2")
+
+                .then()
+                .log().body()
+                .statusCode(200)
+                .body("name", equalTo("morpheus"))
+                .body("updatedAt", notNullValue());
+    }
+
+    @Test
+    public void deleteUserTest(){
+        given()
+                .log().uri()
+                .header("x-api-key", "reqres-free-v1")
+                .contentType("application/json")
+
+                .when()
+                .delete("/users/2")
+
+                .then()
+                .log().body()
+                .statusCode(204);
     }
 }
