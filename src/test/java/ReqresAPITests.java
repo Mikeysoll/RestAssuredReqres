@@ -140,7 +140,7 @@ public class ReqresAPITests extends TestBase {
                 .log().uri()
 
                 .when()
-                .post("https://reqres.in/api/login")
+                .post("/login")
 
                 .then()
                 .log().status()
