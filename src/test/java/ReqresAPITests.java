@@ -1,6 +1,7 @@
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
+import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.*;
 
 import static io.restassured.RestAssured.given;
@@ -126,5 +127,25 @@ public class ReqresAPITests extends TestBase {
                 .then()
                 .log().body()
                 .statusCode(204);
+    }
+
+    @Test
+    void successfulLoginTest() {
+        String authData = "{\"email\": \"eve.holt@reqres.in\", \"password\": \"cityslicka\"}";
+
+        given()
+                .body(authData)
+                .header("x-api-key", "reqres-free-v1")
+                .contentType(JSON)
+                .log().uri()
+
+                .when()
+                .post("https://reqres.in/api/login")
+
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(200)
+                .body("token", is("QpwL5tke4Pnpja7X4"));
     }
 }
