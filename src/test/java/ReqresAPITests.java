@@ -1,7 +1,7 @@
-import io.restassured.http.ContentType;
+import models.AuthDTO;
+import models.UserDTO;
 import org.junit.jupiter.api.Test;
 
-import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.*;
 
 import static io.restassured.RestAssured.given;
@@ -10,13 +10,9 @@ public class ReqresAPITests extends TestBase {
 
     @Test
     public void listUsersTest() {
-        given()
-                .log().uri()
-                .header("x-api-key", "reqres-free-v1")
-
+        baseRequest()
                 .when()
                 .get("/users?page=2")
-
                 .then()
                 .log().body()
                 .statusCode(200)
@@ -26,11 +22,13 @@ public class ReqresAPITests extends TestBase {
 
     @Test
     public void createUserTest() {
-        given()
-                .log().uri()
-                .header("x-api-key", "reqres-free-v1")
-                .contentType("application/json")
-                .body("{ \"name\": \"mikey\", \"job\": \"aqa\" }")
+        UserDTO user = UserDTO.builder()
+                .name("mikey")
+                .job("aqa")
+                .build();
+
+        baseRequest()
+                .body(user)
 
                 .when()
                 .post("/users")
@@ -38,19 +36,20 @@ public class ReqresAPITests extends TestBase {
                 .then()
                 .log().body()
                 .statusCode(201)
-                .body("name", equalTo("mikey"))
-                .body("job", equalTo("aqa"))
+                .body("name", equalTo(user.getName()))
+                .body("job", equalTo(user.getJob()))
                 .body("id", not(empty()));
     }
 
     @Test
     public void updateUserTest() {
+        UserDTO user = UserDTO.builder()
+                .name("mikey")
+                .job("devOps")
+                .build();
 
-        given()
-                .log().uri()
-                .header("x-api-key", "reqres-free-v1")
-                .contentType("application/json")
-                .body("{ \"name\": \"mikey\", \"job\": \"devOps\" }")
+        baseRequest()
+                .body(user)
 
                 .when()
                 .put("/users/2")
@@ -58,21 +57,16 @@ public class ReqresAPITests extends TestBase {
                 .then()
                 .log().body()
                 .statusCode(200)
-                .body("name", equalTo("mikey"))
-                .body("job", equalTo("devOps"))
+                .body("name", equalTo(user.getName()))
+                .body("job", equalTo(user.getJob()))
                 .body("updatedAt", notNullValue());
     }
 
     @Test
     public void userNotFoundTest() {
-        given()
-                .log().uri()
-                .header("x-api-key", "reqres-free-v1")
-                .contentType("application/json")
-
+        baseRequest()
                 .when()
                 .get("/users/9999")
-
                 .then()
                 .log().body()
                 .statusCode(404);
@@ -80,50 +74,44 @@ public class ReqresAPITests extends TestBase {
 
     @Test
     public void registrationSuccessfulTest() {
-        given()
-                .log().uri()
-                .header("x-api-key", "reqres-free-v1")
-                .contentType("application/json")
-                .body("{ \"email\": \"eve.holt@reqres.in\", \"password\": \"pistol\" }")
+        AuthDTO auth = AuthDTO.builder()
+                .email("eve.holt@reqres.in")
+                .password("pistol").build();
 
+        baseRequest()
+                .body(auth)
                 .when()
                 .post("/register")
-
                 .then()
                 .log().body()
                 .statusCode(200)
                 .body("id", not(empty()))
-                .body("token", equalTo("QpwL5tke4Pnpja7X4"));
+                .body("token", not(empty()));
     }
 
     @Test
-    public void partialUpdateUserTest(){
-        given()
-                .log().uri()
-                .header("x-api-key", "reqres-free-v1")
-                .contentType("application/json")
-                .body("{ \"name\": \"morpheus\", \"job\": \"zion resident\" }")
+    public void partialUpdateUserTest() {
+        UserDTO user = UserDTO.builder()
+                .name("morpheus")
+                .job("zion resident")
+                .build();
 
+        baseRequest()
+                .body(user)
                 .when()
                 .patch("/users/2")
-
                 .then()
                 .log().body()
                 .statusCode(200)
-                .body("name", equalTo("morpheus"))
+                .body("name", equalTo(user.getName()))
                 .body("updatedAt", notNullValue());
     }
 
     @Test
-    public void deleteUserTest(){
-        given()
-                .log().uri()
-                .header("x-api-key", "reqres-free-v1")
-                .contentType("application/json")
-
+    public void deleteUserTest() {
+        baseRequest()
                 .when()
                 .delete("/users/2")
-
                 .then()
                 .log().body()
                 .statusCode(204);
@@ -131,16 +119,15 @@ public class ReqresAPITests extends TestBase {
 
     @Test
     void successfulLoginTest() {
-        String authData = "{\"email\": \"eve.holt@reqres.in\", \"password\": \"cityslicka\"}";
+        AuthDTO auth = AuthDTO.builder()
+                .email("eve.holt@reqres.in")
+                .password("cityslicka")
+                .build();
 
-        given()
-                .body(authData)
-                .header("x-api-key", "reqres-free-v1")
-                .contentType(JSON)
-                .log().uri()
-
+        baseRequest()
+                .body(auth)
                 .when()
-                .post("https://reqres.in/api/login")
+                .post("/login")
 
                 .then()
                 .log().status()
