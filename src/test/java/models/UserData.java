@@ -2,7 +2,6 @@ package models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,14 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserDTO {
-    private String name;
-    private String job;
-    private String id;
-    private String createdAt;
-
-    public UserDTO(String name, String job) {
-        this.name = name;
-        this.job = job;
-    }
+public class UserData {
+    private int id;
+    private String email;
+    private String first_name;
+    private String last_name;
+    private String avatar;
 }

@@ -17,7 +17,7 @@ public class TestBase {
 
     protected RequestSpecification baseRequest() {
         return given()
-                .header("x-api-key", "reqres-free-v1")
+                .header("x-api-key", "reqres_f9e34898826a4f4682a2d39ec238602a")
                 .contentType(ContentType.JSON)
                 .filter(withCustomTemplates());
     }

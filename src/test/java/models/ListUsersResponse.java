@@ -2,22 +2,20 @@ package models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserDTO {
-    private String name;
-    private String job;
-    private String id;
-    private String createdAt;
-
-    public UserDTO(String name, String job) {
-        this.name = name;
-        this.job = job;
-    }
+public class ListUsersResponse {
+    private int page;
+    private int per_page;
+    private int total;
+    private int total_pages;
+    private List<UserData> data;
 }
+

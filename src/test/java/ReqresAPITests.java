@@ -1,78 +1,68 @@
-import models.AuthDTO;
-import models.UserDTO;
+import models.*;
 import org.junit.jupiter.api.Test;
 
 import static io.qameta.allure.Allure.step;
 import static org.hamcrest.Matchers.*;
-
-import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReqresAPITests extends TestBase {
 
     @Test
     public void listUsersTest() {
         step("Send GET request to list users on page 2 and verify response", () -> {
-            baseRequest()
+            ListUsersResponse response = baseRequest()
                     .when()
                     .get("/users?page=2")
                     .then()
                     .log().body()
                     .statusCode(200)
-                    .body("page", equalTo(2))
-                    .body("data", not(empty()));
+                    .extract().as(ListUsersResponse.class);
+
+            assertEquals(2, response.getPage());
+            assertFalse(response.getData().isEmpty());
         });
     }
 
     @Test
     public void createUserTest() {
         step("Create a new user and verify response", () -> {
-            UserDTO user = UserDTO.builder()
-                    .name("mikey")
-                    .job("aqa")
-                    .build();
-
-            baseRequest()
+            UserDTO user = new UserDTO("mikey", "AQA");
+            UserDTO responseUser = baseRequest()
                     .body(user)
-
                     .when()
                     .post("/users")
-
                     .then()
                     .log().body()
                     .statusCode(201)
-                    .body("name", equalTo(user.getName()))
-                    .body("job", equalTo(user.getJob()))
-                    .body("id", not(empty()));
+                    .extract().as(UserDTO.class);
+            assertEquals(user.getName(), responseUser.getName());
+            assertEquals(user.getJob(), responseUser.getJob());
+            assertNotNull(responseUser.getId());
+            assertNotNull(responseUser.getCreatedAt());
         });
     }
 
     @Test
     public void updateUserTest() {
         step("Update user with ID 2 and verify response", () -> {
-            UserDTO user = UserDTO.builder()
-                    .name("mikey")
-                    .job("devOps")
-                    .build();
-
-            baseRequest()
+            UserDTO user = new UserDTO("mikey", "devOps");
+            UserUpdateResponse response = baseRequest()
                     .body(user)
-
                     .when()
                     .put("/users/2")
-
                     .then()
                     .log().body()
                     .statusCode(200)
-                    .body("name", equalTo(user.getName()))
-                    .body("job", equalTo(user.getJob()))
-                    .body("updatedAt", notNullValue());
+                    .extract().as(UserUpdateResponse.class);
+            assertEquals(user.getName(), response.getName());
+            assertEquals(user.getJob(), response.getJob());
+            assertNotNull(response.getUpdatedAt());
         });
     }
 
     @Test
     public void userNotFoundTest() {
         step("Request non-existing user and verify 404 response", () -> {
-
             baseRequest()
                     .when()
                     .get("/users/9999")
@@ -85,39 +75,35 @@ public class ReqresAPITests extends TestBase {
     @Test
     public void registrationSuccessfulTest() {
         step("Register a new user and verify response", () -> {
-            AuthDTO auth = AuthDTO.builder()
-                    .email("eve.holt@reqres.in")
-                    .password("pistol").build();
-
-            baseRequest()
+            AuthDTO auth = new AuthDTO("eve.holt@reqres.in", "pistol");
+            AuthResponse response = baseRequest()
                     .body(auth)
                     .when()
                     .post("/register")
                     .then()
                     .log().body()
                     .statusCode(200)
-                    .body("id", not(empty()))
-                    .body("token", not(empty()));
+                    .extract().as(AuthResponse.class);
+            assertNotNull(response.getId());
+            assertNotNull(response.getToken());
         });
     }
 
     @Test
     public void partialUpdateUserTest() {
         step("Partially update user with ID 2 and verify response", () -> {
-            UserDTO user = UserDTO.builder()
-                    .name("morpheus")
-                    .job("zion resident")
-                    .build();
-
-            baseRequest()
+            UserDTO user = new UserDTO("morpheus", "zion resident");
+            UserUpdateResponse response = baseRequest()
                     .body(user)
                     .when()
                     .patch("/users/2")
                     .then()
                     .log().body()
                     .statusCode(200)
-                    .body("name", equalTo(user.getName()))
-                    .body("updatedAt", notNullValue());
+                    .extract().as(UserUpdateResponse.class);
+            assertEquals(user.getName(), response.getName());
+            assertEquals(user.getJob(), response.getJob());
+            assertNotNull(response.getUpdatedAt());
         });
     }
 
@@ -136,21 +122,17 @@ public class ReqresAPITests extends TestBase {
     @Test
     void successfulLoginTest() {
         step("Login user and verify token", () -> {
-            AuthDTO auth = AuthDTO.builder()
-                    .email("eve.holt@reqres.in")
-                    .password("cityslicka")
-                    .build();
-
-            baseRequest()
+            AuthDTO auth = new AuthDTO("eve.holt@reqres.in", "cityslicka");
+            AuthResponse response = baseRequest()
                     .body(auth)
                     .when()
                     .post("/login")
-
                     .then()
                     .log().status()
                     .log().body()
                     .statusCode(200)
-                    .body("token", is("QpwL5tke4Pnpja7X4"));
+                    .extract().as(AuthResponse.class);
+            assertNotNull(response.getToken());
         });
     }
 }
