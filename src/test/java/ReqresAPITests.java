@@ -17,7 +17,6 @@ public class ReqresAPITests extends TestBase {
                     .log().body()
                     .statusCode(200)
                     .extract().as(ListUsersResponse.class);
-
             assertEquals(2, response.getPage());
             assertFalse(response.getData().isEmpty());
         });
